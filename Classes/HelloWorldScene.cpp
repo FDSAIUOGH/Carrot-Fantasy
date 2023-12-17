@@ -1,10 +1,8 @@
 #include "HelloWorldScene.h"
 #include "cocostudio/CocoStudio.h"
 #include "ui/CocosGUI.h"
-#include "MissonScene.hpp"
 
 USING_NS_CC;
-using namespace ui;
 
 using namespace cocostudio::timeline;
 
@@ -87,50 +85,8 @@ bool HelloWorld::init()
     }
     
     auto rootNode = CSLoader::createNode("MainScene.csb");
+
     addChild(rootNode);
 
-    Button *startBtn=(Button*)rootNode->getChildByName("Start_Btn");
-    startBtn->setPressedActionEnabled(true);
-    startBtn->addTouchEventListener(CC_CALLBACK_2(HelloWorld::startGame,this));
-    
-    Button *shareBtn=(Button*)rootNode->getChildByName("Share_Btn");
-    shareBtn->addTouchEventListener(CC_CALLBACK_2(HelloWorld::shareGame,this));
-
-    
     return true;
-}
-
-void HelloWorld::startGame(Ref *pSender, cocos2d::ui::Widget::TouchEventType type){
-    switch (type)
-    {
-        case cocos2d::ui::Widget::TouchEventType::BEGAN:
-        {
-            log("touch began");
-            break;
-        }
-        case cocos2d::ui::Widget::TouchEventType::MOVED:
-        {
-            log("touch moved");
-            break;
-        }
-        case cocos2d::ui::Widget::TouchEventType::ENDED:
-        {
-            log("start game");
-            auto missonScene=MissonScene::createScene();
-            Director::getInstance()->pushScene(missonScene);
-            break;
-        }
-        case cocos2d::ui::Widget::TouchEventType::CANCELED:
-        {
-            log("touch canceled");
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-
-void HelloWorld::shareGame(Ref *pSender, cocos2d::ui::Widget::TouchEventType type){
-    log("share game");
 }
