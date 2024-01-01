@@ -29,7 +29,7 @@
 		"buffID":7002,
 		"moveAnimateID":3025,
 		"speed":0,
-		"ack":500
+		"ack":20
 },
 {
 		"id":6004,
@@ -39,7 +39,7 @@
 		"buffID":7001,
 		"moveAnimateID":3028,
 		"speed":0,
-		"ack":500
+		"ack":10
 },
 
 	{

@@ -2,8 +2,12 @@
 #include "HelperScene.h"
 #include "GameMenu.h"
 #include "ui/CocosGUI.h"
+#include "audio/include/AudioEngine.h"
 
 USING_NS_CC;
+
+using namespace cocos2d::experimental;
+using namespace cocos2d::ui;
 /*错误处理*/
 static void problemLoading(const char* filename)
 {
@@ -37,21 +41,23 @@ bool HelperScene::init()
 	background_image->setPosition(Vec2(origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height / 2));
 	this->addChild(background_image);
-	/********************************  help_layer  *******************************/
+	//help_layer
 	auto help_layer = HelpLayer::createLayer();
 	help_layer->setName("HelpLayer");
 	this->addChild(help_layer);
-	/********************************  monster_layer  *****************************************/
+	//monster_layer 
 	auto monster_layer = MonsterLayer::createLayer();
 	monster_layer->setName("MonsterLayer");
-	monster_layer->setVisible(false);
+	monster_layer->setVisible(false);//初始化时被设置为不可见状态
 	this->addChild(monster_layer);
-	/*********************************  tower_layer  **********************************/
+	// tower_layer
 	auto tower_layer = TowerLayer::createLayer();
 	tower_layer->setName("TowerLayer");
-	tower_layer->setVisible(false);
+	tower_layer->setVisible(false);//初始化时被设置为不可见状态
 	this->addChild(tower_layer);
-	/**************************************************  菜单  *****************************************************/
+
+
+	//home键
 	auto menu_all = Menu::create();
 	menu_all->setPosition(Vec2::ZERO);
 
@@ -64,9 +70,18 @@ bool HelperScene::init()
 	//help选项卡
 	auto help_btn = ui::Button::create("/HelperScene/help_1-hd-33_normal.PNG", "/HelperScene/help_1-hd-33_normal.PNG", "/HelperScene/help_1-hd_33.PNG");
 	help_btn->setName("HelpBtn");
+	help_btn->setScale(0.8);
 	help_btn->setPosition(Vec2(origin.x + visibleSize.width*0.31,
 		origin.y + visibleSize.height*0.925));
-	help_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_help, this));
+	//help_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_help, this));
+	help_btn->addTouchEventListener([=](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::BEGAN) {
+			AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
+		}
+		else if (type == ui::Widget::TouchEventType::ENDED) {
+			goto_help(sender);
+		}
+		});
 	help_btn->setEnabled(false);
 	this->addChild(help_btn);
 	//monster选项卡
@@ -74,16 +89,29 @@ bool HelperScene::init()
 	monster_btn->setName("MonsterBtn");
 	monster_btn->setPosition(Vec2(origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height*0.922));
-	monster_btn->setScale(1.4);
-	monster_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_monster, this));
+	//monster_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_monster, this));
+	monster_btn->addTouchEventListener([=](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::BEGAN) {
+			AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
+		}
+		else if (type == ui::Widget::TouchEventType::ENDED) {
+			goto_monsters(sender);
+		}
+		});
 	this->addChild(monster_btn);
 	//person选项卡
 	auto tower_btn = ui::Button::create("/HelperScene/help_1-hd_66_normal.PNG", "/HelperScene/help_1-hd_66_normal.PNG", "/HelperScene/help_1-hd_66.PNG");
 	tower_btn->setName("TowerBtn");
 	tower_btn->setPosition(Vec2(origin.x + visibleSize.width*0.69,
 		origin.y + visibleSize.height*0.923));
-	tower_btn->setScale(1.4);
-	tower_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_tower, this));
+	//tower_btn->addTouchEventListener(CC_CALLBACK_1(HelperScene::goto_tower, this));
+	tower_btn->addTouchEventListener([=](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::BEGAN) {
+			AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
+			goto_towers(sender); // 在按下时直接执行函数
+		}
+		});
+
 	this->addChild(tower_btn);
 
 
@@ -91,12 +119,13 @@ bool HelperScene::init()
 }
 void HelperScene::goto_home(Ref* psender)
 {
+	AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
 	Scene* menu_scene = CGameMenu::createScene();
-	Director::getInstance()->replaceScene(TransitionSlideInT::create(0.3, menu_scene));
+	Director::getInstance()->replaceScene(TransitionFade::create(0.5, menu_scene, Color3B::BLACK));
 }
 void HelperScene::goto_help(Ref* psender)
 {
-
+	//AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
 	Node* help = this->getChildByName("HelpLayer");
 	Node* monster = this->getChildByName("MonsterLayer");
 	Node* tower = this->getChildByName("TowerLayer");
@@ -112,17 +141,16 @@ void HelperScene::goto_help(Ref* psender)
 	static_cast<Sprite*>(num)->setTexture("/HelperScene/num_1.png");
 
 	Node* help_btn = this->getChildByName("HelpBtn");
-	help_btn->setScale(1);
+	help_btn->setScale(0.8);
 	static_cast<ui::Button*>(help_btn)->setEnabled(false);
 	Node* monster_btn = this->getChildByName("MonsterBtn");
-	monster_btn->setScale(1.4);
 	static_cast<ui::Button*>(monster_btn)->setEnabled(true);
 	Node* tower_btn = this->getChildByName("TowerBtn");
-	tower_btn->setScale(1.4);
 	static_cast<ui::Button*>(tower_btn)->setEnabled(true);
 }
-void HelperScene::goto_monster(Ref* psender)
+void HelperScene::goto_monsters(Ref* psender)
 {
+	//AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
 	Node* help = this->getChildByName("HelpLayer");
 	Node* monster = this->getChildByName("MonsterLayer");
 	Node* tower = this->getChildByName("TowerLayer");
@@ -132,17 +160,16 @@ void HelperScene::goto_monster(Ref* psender)
 	tower->setVisible(false);
 
 	Node* help_btn = this->getChildByName("HelpBtn");
-	help_btn->setScale(1.4);
 	static_cast<ui::Button*>(help_btn)->setEnabled(true);
 	Node* monster_btn = this->getChildByName("MonsterBtn");
-	monster_btn->setScale(1);
+	monster_btn->setScale(0.8);
 	static_cast<ui::Button*>(monster_btn)->setEnabled(false);
 	Node* tower_btn = this->getChildByName("TowerBtn");
-	tower_btn->setScale(1.4);
 	static_cast<ui::Button*>(tower_btn)->setEnabled(true);
 }
-void HelperScene::goto_tower(Ref* psender)
+void HelperScene::goto_towers(Ref* psender)
 {
+	AudioEngine::play2d("sound/Select.mp3", false, 1.2f);
 	Node* help = this->getChildByName("HelpLayer");
 	Node* monster = this->getChildByName("MonsterLayer");
 	Node* tower = this->getChildByName("TowerLayer");
@@ -158,13 +185,11 @@ void HelperScene::goto_tower(Ref* psender)
 	static_cast<Sprite*>(num)->setTexture("/HelperScene/num_1.png");
 
 	Node* help_btn = this->getChildByName("HelpBtn");
-	help_btn->setScale(1.4);
 	static_cast<ui::Button*>(help_btn)->setEnabled(true);
 	Node* monster_btn = this->getChildByName("MonsterBtn");
-	monster_btn->setScale(1.4);
 	static_cast<ui::Button*>(monster_btn)->setEnabled(true);
 	Node* tower_btn = this->getChildByName("TowerBtn");
-	tower_btn->setScale(1);
+	tower_btn->setScale(0.8);
 	static_cast<ui::Button*>(tower_btn)->setEnabled(false);
 }
 /*************************************** HelpLayer类  ******************************************/
@@ -214,10 +239,10 @@ bool HelpLayer::init()
 	this->addChild(toplayer);
 
 	/***************************  页码  ******************************/
-	auto page_num_image = Sprite::create("/HelperScene/help_1-hd_0.PNG");
+	auto page_num_image = Sprite::create("/HelperScene/help_1-hd_0.PNG");//创建了一个 Sprite 对象，用于显示页码的背景图片
 	page_num_image->setPosition(Vec2(origin.x + visibleSize.width *0.51, origin.y + visibleSize.height * 0.06));
 	this->addChild(page_num_image);
-	auto num_divide = Sprite::create("/HelperScene/num_-1.png");
+	auto num_divide = Sprite::create("/HelperScene/num_-1.png");//标记图片，用于表示页码之间的分隔符和最大页码数
 	num_divide->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height * 0.062));
 	this->addChild(num_divide);
 	num_divide->setScale(1.4);
@@ -225,24 +250,28 @@ bool HelpLayer::init()
 	num_4->setPosition(Vec2(origin.x + visibleSize.width / 2 + num_4->getContentSize().width * 2, origin.y + visibleSize.height * 0.062));
 	this->addChild(num_4);
 	num_4->setScale(1.4);
-	auto page_num = Sprite::create("/HelperScene/num_1.png");
+	auto page_num = Sprite::create("/HelperScene/num_1.png");//创建了一个 Sprite 对象用于显示当前页码的数字图片
 	page_num->setName("page_num1");
 	page_num->setScale(1.4);
 	page_num->setPosition(Vec2(origin.x + visibleSize.width / 2 - page_num->getContentSize().width * 3, origin.y + visibleSize.height * 0.062));
 	this->addChild(page_num);
 	/****************************  滑动实现  *****************************/
-	auto listener = EventListenerTouchOneByOne::create();
+	auto listener = EventListenerTouchOneByOne::create();//创建了一个触摸监听器
+	//onTouchBegan 函数捕获触摸开始事件，并返回 true，表示事件已被处理
 	listener->onTouchBegan = [](Touch* touch, Event* event) {
 		return true;
 	};
+	//onTouchMoved 函数捕获触摸移动事件，计算出触摸点在水平方向上的位移 distance，并通过修改 toplayer 的 X 位置来实现滑动效果
 	listener->onTouchMoved = [this,toplayer](Touch* touch, Event* event) {
 		float distance = touch->getLocation().x - touch->getPreviousLocation().x;
 		toplayer->setPositionX(toplayer->getPositionX() + distance);
 	};
+	//onTouchEnded 函数捕获触摸结束事件，计算触摸点的起始位置与结束位置之间的水平位移 distance。
 	listener->onTouchEnded = [this,toplayer,visibleSize](Touch* touch, Event* event) {
 		float distance = touch->getLocation().x - touch->getStartLocation().x;
 		float page[4] = { 0,-visibleSize.width,-2 * visibleSize.width,-3 * visibleSize.width };
 		if (distance > visibleSize.width / 6) {
+		//如果位移超过屏幕宽度的六分之一，且向右滑动
 			if (toplayer->getPosition().x > 0) {
 				toplayer->runAction(MoveTo::create(0.1, Vec2(page[0], 0)));
 			}
@@ -265,6 +294,7 @@ bool HelpLayer::init()
 			}
 		}
 		else if (distance < -visibleSize.width / 6) {
+		//如果位移超过屏幕宽度的六分之一，且向左滑动
 			if (toplayer->getPosition().x < page[3]) {
 				toplayer->runAction(MoveTo::create(0.1, Vec2(page[3], 0)));
 			}
@@ -287,6 +317,7 @@ bool HelpLayer::init()
 			}
 		}
 		else {
+			//如果位移没有达到六分之一屏幕宽度
 			if (distance > 0) {
 				if (toplayer->getPosition().x < 0 && toplayer->getPosition().x >page[1]) {
 					toplayer->runAction(MoveTo::create(0.1, Vec2(page[1], 0)));
@@ -402,7 +433,7 @@ bool TowerLayer::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	/**************************  滑动层  ********************************/
-	auto toplayer2 = Layer::create();
+	auto toplayer2 = Layer::create();//创建了新的图层对象toplayer2,用于展示滑动的内容
 	toplayer2->setName("toplayer2");
 	/**************************  第1页  ******************************/
 	auto tower_1 = Sprite::create("/HelperScene/tower_1.png");
@@ -456,18 +487,22 @@ bool TowerLayer::init()
 	toplayer2->addChild(tower_10);
 	this->addChild(toplayer2);
 	/***************************  页码  ******************************/
+	//page_num_image 是用于显示页码的背景图片的精灵对象
 	auto page_num_image = Sprite::create("/HelperScene/help_1-hd_0.PNG");
 	page_num_image->setPosition(Vec2(origin.x + visibleSize.width * 0.51, origin.y + visibleSize.height * 0.06));
 	this->addChild(page_num_image);
-	auto num_divide = Sprite::create("/HelperScene/num_-1.png");
-	num_divide->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height * 0.062));
-	this->addChild(num_divide);
-	num_divide->setScale(1.4);
+	//num_divide 是用于显示分隔符的精灵对象
+	auto divide_num = Sprite::create("/HelperScene/num_-1.png");
+	divide_num->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height * 0.062));
+	this->addChild(divide_num);
+	divide_num->setScale(1.4);
+	//num_10 是显示数字 "10" 的精灵对象,表示总页码为10
 	auto num_10 = Sprite::create("/HelperScene/num_10.png");
 	num_10->setPosition(Vec2(origin.x + visibleSize.width / 2 + num_10->getContentSize().width, 
 		origin.y + visibleSize.height * 0.062));
 	this->addChild(num_10);
 	num_10->setScale(1.4);
+	//page_num 是用于显示当前页码的精灵对象
 	auto page_num = Sprite::create("/HelperScene/num_1.png");
 	page_num->setName("page_num2");
 	page_num->setScale(1.4);

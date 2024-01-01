@@ -37,7 +37,7 @@ void CRoleBase::createHpBar()
 
 bool CRoleBase::Damage(int nDamage)
 {
-	m_nHp += nDamage;
+	m_nHp -= nDamage;
 	if (m_nHp<=0)
 	{
 		m_pHpBar->setPercentage(0);

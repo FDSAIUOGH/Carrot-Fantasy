@@ -14,7 +14,8 @@ public:
 	Vec2 getTiledByPos(Vec2 pixelPos);
 	//转换接口：把格子坐标转换到像素坐标
 	Vec2 getPixelByTiledPos(Vec2 tiledPos);
-	int clickEvent(Vec2 clickPos);
+	//int clickEvent(Vec2 clickPos);
+	// 
 	//获取设计地图的时候所有的对象的坐标（以后怪物的出生点，拐点坐标）
 	std::vector<Vec2> getInitPos();
 	//接口，判断一个作标是否在某个层上

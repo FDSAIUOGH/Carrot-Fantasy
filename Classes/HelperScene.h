@@ -14,9 +14,9 @@ public:
 
     virtual void goto_help(Ref* psender);
 
-    virtual void goto_monster(Ref* psender);
+    virtual void goto_monsters(Ref* psender);
 
-    virtual void goto_tower(Ref* psender);
+    virtual void goto_towers(Ref* psender);
 
     CREATE_FUNC(HelperScene);
 };

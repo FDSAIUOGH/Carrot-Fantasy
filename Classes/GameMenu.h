@@ -9,18 +9,19 @@ public:
 
     virtual bool init();
 
-    void close_game(Ref* pSender);
+    void game_close(Ref* pSender);
 
-    void goto_options(Ref* pSender);
+    void goto_sets(Ref* pSender);
 
     void goto_helper(Ref* pSender);
 
     void goto_adventure(Ref* psender);
 
-    void goto_boss(Ref* psender);
+    void goto_bossmode(Ref* psender);
 
-    void goto_nest(Ref* psender);
+    void goto_monsternest(Ref* psender);
 
+    void InitSprite(cocos2d::Sprite*& outSprite, cocos2d::Node* parentNode, const std::string& fileName, float x, float y, int localZOrder);
     CREATE_FUNC(CGameMenu);
 };
 
